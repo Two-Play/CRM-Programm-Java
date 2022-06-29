@@ -31,7 +31,7 @@ public class AnmeldungGui extends JFrame {
 	private JPanel contentPane;
 	private JTextField txtBenutzername;
 	private JPasswordField passwordField;
-
+	
 	/**
 	 * Launch the application.
 	 */
@@ -57,7 +57,7 @@ public class AnmeldungGui extends JFrame {
 	 * Create the frame.
 	 */
 	public AnmeldungGui() {
-		Fachklasse db = new Fachklasse();
+		Fachklasse fa = new Fachklasse();
 		
 		setResizable(false);
 		setType(Type.POPUP);
@@ -74,6 +74,7 @@ public class AnmeldungGui extends JFrame {
 		lblAnmelden.setFont(new Font("Tahoma", Font.BOLD, 35));
 		
 		txtBenutzername = new JTextField();
+		txtBenutzername.setText("root");
 		txtBenutzername.setColumns(10);
 		
 		JLabel lblBenutzername = new JLabel("Benutzername");
@@ -83,9 +84,13 @@ public class AnmeldungGui extends JFrame {
 		JButton btnAnmelden = new JButton("Anmelden");
 		btnAnmelden.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				db.connect();
-				
-			}
+				fa.setUser(txtBenutzername.getText());
+				fa.setPassword(String.valueOf(passwordField.getPassword()));
+				if (fa.startConnect()) {
+				setVisible(false);
+				dispose();
+				new MainView(txtBenutzername.getText()).setVisible(true);
+				}			}
 		});
 		
 		JButton btnBeenden = new JButton("Beenden");

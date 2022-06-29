@@ -6,22 +6,53 @@ import java.sql.*;
 
 public class Fachklasse {
 	
+	private Connection connection = null;
 	
-	Connection connection;
 	private String url = "jdbc:mysql://localhost:3306/";
 	private String user = "root";
-	private String password = "df";
+	private String password = "";
 	
-	public void connect() {
+	//Getter Setter
+	public Connection getConnection() {
+		return connection;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+
+	public boolean startConnect() {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			connection = DriverManager.getConnection(url, user, password);
 			//Statement statement = connection.createStatement();
 			System.out.println("Anmeldung Erfolgreich");
-			
+			return true;
 		}catch (Exception e) {
 			System.out.println(e);
 			JOptionPane.showMessageDialog(null, e, "Fehler", JOptionPane.ERROR_MESSAGE);
+			return false;
 		}
 	}
 	
@@ -34,5 +65,7 @@ public class Fachklasse {
 			JOptionPane.showMessageDialog(null, e, "Fehler", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+	
+	
 
 }
