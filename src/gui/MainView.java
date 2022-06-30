@@ -1,6 +1,5 @@
 package gui;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 
@@ -8,11 +7,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import fachklasse.Fachklasse;
+import fachklasse.DBManager;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JToolBar;
 import javax.swing.JTable;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -20,16 +18,46 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JScrollPane;
+import javax.swing.table.DefaultTableModel;
 
 public class MainView extends JFrame {
 
 	private JPanel contentPane;
-	private JTable table;
 	private JTextField txtbenutzer;
+
+	private String host;
+	private String user;
+	private String password;
+	private JTable table;
 	
-	/**
-	 * Launch the application.
-	 */
+	
+	
+	
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -47,7 +75,7 @@ public class MainView extends JFrame {
 	 * Create the frame.
 	 */
 	public MainView() {
-		Fachklasse fa = new Fachklasse();
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 738, 486);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
@@ -55,8 +83,6 @@ public class MainView extends JFrame {
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		
-		table = new JTable();
 		
 		JLabel lblNewLabel = new JLabel("Angemeldet als:");
 		
@@ -70,15 +96,17 @@ public class MainView extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				Benutzervewaltung bnv = new Benutzervewaltung();
 				bnv.setVisible(true);
-			}
+				}
 		});
+		
+		JScrollPane scrollPane = new JScrollPane();
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addComponent(table, GroupLayout.DEFAULT_SIZE, 692, Short.MAX_VALUE)
+						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 692, Short.MAX_VALUE)
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addComponent(lblNewLabel)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -95,16 +123,35 @@ public class MainView extends JFrame {
 						.addComponent(lblNewLabel)
 						.addComponent(txtbenutzer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnNewButton))
-					.addPreferredGap(ComponentPlacement.RELATED, 89, Short.MAX_VALUE)
-					.addComponent(table, GroupLayout.PREFERRED_SIZE, 306, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 332, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
-		contentPane.setLayout(gl_contentPane);
 		
+		table = new JTable();
+		table.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"Vorname", "Name"
+			}
+		) {
+			Class[] columnTypes = new Class[] {
+				String.class, String.class
+			};
+			public Class getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+		});
+		scrollPane.setViewportView(table);
+		contentPane.setLayout(gl_contentPane);
 	}
 
-	MainView(String text) {
+	MainView(String benutzer, String passwort, String host) {
 		this();
-		txtbenutzer.setText(text);
+		setUser(benutzer);
+		setPassword(passwort);
+		setHost(host);
+		txtbenutzer.setText(getUser());
 	}
 }

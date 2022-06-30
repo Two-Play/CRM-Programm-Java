@@ -8,12 +8,16 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import fachklasse.Fachklasse;
+import com.mysql.cj.protocol.Resultset;
+
+import extern.ScriptRunner;
+import fachklasse.DBManager;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.Toolkit;
 import javax.swing.UIManager;
@@ -23,6 +27,12 @@ import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import java.awt.Window.Type;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 import javax.swing.JPasswordField;
 
@@ -31,10 +41,9 @@ public class AnmeldungGui extends JFrame {
 	private JPanel contentPane;
 	private JTextField txtBenutzername;
 	private JPasswordField passwordField;
+	private JTextField txtHost;
 	
-	/**
-	 * Launch the application.
-	 */
+	
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -46,6 +55,7 @@ public class AnmeldungGui extends JFrame {
 				try {
 					AnmeldungGui frame = new AnmeldungGui();
 					frame.setVisible(true);
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -57,7 +67,7 @@ public class AnmeldungGui extends JFrame {
 	 * Create the frame.
 	 */
 	public AnmeldungGui() {
-		Fachklasse fa = new Fachklasse();
+		DBManager dbm = new DBManager();
 		
 		setResizable(false);
 		setType(Type.POPUP);
@@ -84,12 +94,37 @@ public class AnmeldungGui extends JFrame {
 		JButton btnAnmelden = new JButton("Anmelden");
 		btnAnmelden.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				fa.setUser(txtBenutzername.getText());
-				fa.setPassword(String.valueOf(passwordField.getPassword()));
-				if (fa.startConnect()) {
+				dbm.setUser(txtBenutzername.getText());
+				dbm.setPassword(String.valueOf(passwordField.getPassword()));
+				dbm.setHost(txtHost.getText());
+				if (dbm.startConnect("")) {
+					if (!dbm.tableExist(dbm.getConnection(), "kunden") || !dbm.databaseExist(dbm.getConnection())) {
+						int dialogButton = JOptionPane.YES_NO_OPTION;
+						int dialogResult = JOptionPane.showConfirmDialog (null, "Keine CRM Datenbank gefunden! Soll eine erstellt werden?","Warning",dialogButton);
+						if(dialogResult == JOptionPane.YES_OPTION){
+								try {
+									ScriptRunner runner = new ScriptRunner(dbm.getConnection(), false, true);
+									runner.runScript(new BufferedReader(new FileReader("src/init.sql")));
+									System.out.println("DB eingefügt");
+									setVisible(false);
+									dispose();
+									new MainView(dbm.getUser(), dbm.getPassword(), dbm.getHost()).setVisible(true);
+
+								} catch (SQLException e1) {
+									e1.printStackTrace();
+								} catch (FileNotFoundException e1) {
+									e1.printStackTrace();
+								} catch (IOException e1) {
+									e1.printStackTrace();
+								}
+							dbm.closeConnection();
+						}
+					}else {
 				setVisible(false);
 				dispose();
-				new MainView(txtBenutzername.getText()).setVisible(true);
+				new MainView(dbm.getUser(), dbm.getPassword(), dbm.getHost()).setVisible(true);
+				}
+				dbm.closeConnection();
 				}			}
 		});
 		
@@ -101,6 +136,12 @@ public class AnmeldungGui extends JFrame {
 		});
 		
 		passwordField = new JPasswordField();
+		
+		JLabel lblHost = new JLabel("Host");
+		
+		txtHost = new JTextField();
+		txtHost.setText("localhost");
+		txtHost.setColumns(10);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -108,19 +149,21 @@ public class AnmeldungGui extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addComponent(lblAnmelden, GroupLayout.DEFAULT_SIZE, 628, Short.MAX_VALUE)
+							.addComponent(lblAnmelden, GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
 							.addContainerGap())
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addGap(135)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-								.addComponent(lblBenutzername, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
-								.addComponent(txtBenutzername, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
-								.addComponent(lblPassw, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
-								.addGroup(gl_contentPane.createSequentialGroup()
-									.addComponent(btnAnmelden, GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
+								.addComponent(lblBenutzername, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
+								.addComponent(txtBenutzername, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
+								.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
+									.addComponent(btnAnmelden, GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
 									.addGap(18)
-									.addComponent(btnBeenden, GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE))
-								.addComponent(passwordField, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE))
+									.addComponent(btnBeenden, GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))
+								.addComponent(lblPassw, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
+								.addComponent(passwordField, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
+								.addComponent(lblHost, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 338, GroupLayout.PREFERRED_SIZE)
+								.addComponent(txtHost, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 338, GroupLayout.PREFERRED_SIZE))
 							.addGap(141))))
 		);
 		gl_contentPane.setVerticalGroup(
@@ -132,15 +175,19 @@ public class AnmeldungGui extends JFrame {
 					.addComponent(lblBenutzername)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(txtBenutzername, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblPassw)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(passwordField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addGap(44)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lblHost)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(txtHost, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(30)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnBeenden)
 						.addComponent(btnAnmelden))
-					.addContainerGap(68, Short.MAX_VALUE))
+					.addContainerGap(42, Short.MAX_VALUE))
 		);
 		contentPane.setLayout(gl_contentPane);
 	}
