@@ -68,7 +68,7 @@ public class AnmeldungGui extends JFrame {
 	 */
 	public AnmeldungGui() {
 		DBManager dbm = new DBManager();
-		
+		//init Gui
 		setResizable(false);
 		setType(Type.POPUP);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
@@ -94,22 +94,27 @@ public class AnmeldungGui extends JFrame {
 		JButton btnAnmelden = new JButton("Anmelden");
 		btnAnmelden.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				//DB datenübermittlung
 				dbm.setUser(txtBenutzername.getText());
 				dbm.setPassword(String.valueOf(passwordField.getPassword()));
 				dbm.setHost(txtHost.getText());
+				//Verbindungsaufbau
 				if (dbm.startConnect("")) {
+					//Überprüfung ob DB und Tabellen exisitieren
 					if (!dbm.tableExist(dbm.getConnection(), "kunden") || !dbm.databaseExist(dbm.getConnection())) {
+						//Dialog Popup
 						int dialogButton = JOptionPane.YES_NO_OPTION;
 						int dialogResult = JOptionPane.showConfirmDialog (null, "Keine CRM Datenbank gefunden! Soll eine erstellt werden?","Warning",dialogButton);
 						if(dialogResult == JOptionPane.YES_OPTION){
 								try {
+									//DB Erstellung mit sql script
 									ScriptRunner runner = new ScriptRunner(dbm.getConnection(), false, true);
 									runner.runScript(new BufferedReader(new FileReader("src/init.sql")));
 									System.out.println("DB eingefügt");
-									setVisible(false);
+									//Schließt fenster und öffnet MainView falls DB nichht besteht
 									dispose();
 									new MainView(dbm.getUser(), dbm.getPassword(), dbm.getHost()).setVisible(true);
-
+									//Fehler handler
 								} catch (SQLException e1) {
 									e1.printStackTrace();
 								} catch (FileNotFoundException e1) {
@@ -120,7 +125,7 @@ public class AnmeldungGui extends JFrame {
 							dbm.closeConnection();
 						}
 					}else {
-				setVisible(false);
+				//Schließt fenster und öffnet MainView falls DB schon besteht
 				dispose();
 				new MainView(dbm.getUser(), dbm.getPassword(), dbm.getHost()).setVisible(true);
 				}
@@ -128,6 +133,7 @@ public class AnmeldungGui extends JFrame {
 				}			}
 		});
 		
+		//Beenden Button
 		JButton btnBeenden = new JButton("Beenden");
 		btnBeenden.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

@@ -75,6 +75,7 @@ public class MainView extends JFrame {
 	 * Create the frame.
 	 */
 	public MainView() {
+		DBManager dbm = new DBManager();
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 738, 486);
@@ -91,8 +92,8 @@ public class MainView extends JFrame {
 		txtbenutzer.setEditable(false);
 		txtbenutzer.setColumns(10);
 		
-		JButton btnNewButton = new JButton("Benutzerverwaltung");
-		btnNewButton.addActionListener(new ActionListener() {
+		JButton btnBenutzerverwaltung = new JButton("Benutzerverwaltung");
+		btnBenutzerverwaltung.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Benutzervewaltung bnv = new Benutzervewaltung();
 				bnv.setVisible(true);
@@ -100,6 +101,25 @@ public class MainView extends JFrame {
 		});
 		
 		JScrollPane scrollPane = new JScrollPane();
+		
+		JButton btnAbmelden = new JButton("Abmelden");
+		btnAbmelden.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (dbm.getConnection() != null) {
+					dbm.closeConnection();
+					System.out.println("tets");
+				}
+				dispose();
+				new AnmeldungGui().setVisible(true);
+			}
+		});
+		
+		JButton btnNeuerKunde = new JButton("Neuer Kunde anlegen");
+		btnNeuerKunde.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new NeuerKunde().setVisible(true);
+			}
+		});
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -112,7 +132,11 @@ public class MainView extends JFrame {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(txtbenutzer, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
 							.addGap(18)
-							.addComponent(btnNewButton)))
+							.addComponent(btnBenutzerverwaltung)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnAbmelden)
+							.addPreferredGap(ComponentPlacement.RELATED, 181, Short.MAX_VALUE)
+							.addComponent(btnNeuerKunde)))
 					.addContainerGap())
 		);
 		gl_contentPane.setVerticalGroup(
@@ -122,7 +146,9 @@ public class MainView extends JFrame {
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel)
 						.addComponent(txtbenutzer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnNewButton))
+						.addComponent(btnBenutzerverwaltung)
+						.addComponent(btnAbmelden)
+						.addComponent(btnNeuerKunde))
 					.addPreferredGap(ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
 					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 332, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
