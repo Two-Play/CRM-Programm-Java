@@ -27,6 +27,8 @@ import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import java.awt.Window.Type;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -35,6 +37,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 import javax.swing.JPasswordField;
+import java.awt.event.KeyAdapter;
 
 public class AnmeldungGui extends JFrame {
 
@@ -64,12 +67,18 @@ public class AnmeldungGui extends JFrame {
 		});
 	}
 
+	  public void keyPressed(KeyEvent e) {
+		    if (e.getKeyCode()==KeyEvent.VK_ENTER){
+		      JOptionPane.showMessageDialog(null , "Your form has been sent");
+		    }
+		  }
+	
 	/**
 	 * Create the frame.
 	 */
 	public AnmeldungGui() {
 		
-		//init Gui
+		//init Gui \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		setResizable(false);
 		setType(Type.POPUP);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
@@ -83,7 +92,7 @@ public class AnmeldungGui extends JFrame {
 		JLabel lblAnmelden = new JLabel("Anmelden");
 		lblAnmelden.setHorizontalAlignment(SwingConstants.CENTER);
 		lblAnmelden.setFont(new Font("Tahoma", Font.BOLD, 35));
-		
+
 		txtBenutzername = new JTextField();
 		txtBenutzername.setText("root");
 		txtBenutzername.setColumns(10);
@@ -94,42 +103,10 @@ public class AnmeldungGui extends JFrame {
 		
 		JButton btnAnmelden = new JButton("Anmelden");
 		btnAnmelden.addActionListener(new ActionListener() {
+			//-------------------------------------------------------------------------------------------------
 			public void actionPerformed(ActionEvent e) {
-				//DB datenübermittlung
-				dbm = new DBManager(txtBenutzername.getText(), String.valueOf(passwordField.getPassword()),txtHost.getText());
-				//Verbindungsaufbau
-				if (dbm.startConnect("")) {
-					//Überprüfung ob DB und Tabellen exisitieren
-					if (!dbm.tableExist(dbm.getConnection(), "kunden") || !dbm.databaseExist(dbm.getConnection())) {
-						//Dialog Popup
-						int dialogButton = JOptionPane.YES_NO_OPTION;
-						int dialogResult = JOptionPane.showConfirmDialog (null, "Keine CRM Datenbank gefunden! Soll eine erstellt werden?","Warning",dialogButton);
-						if(dialogResult == JOptionPane.YES_OPTION){
-								try {
-									//DB Erstellung mit sql script
-									ScriptRunner runner = new ScriptRunner(dbm.getConnection(), false, true);
-									runner.runScript(new BufferedReader(new FileReader("src/init.sql")));
-									System.out.println("DB eingefügt");
-									//Schließt fenster und öffnet MainView falls DB nichht besteht
-									dispose();
-									new MainView(dbm.getUser(), dbm.getPassword(), dbm.getHost()).setVisible(true);
-									//Fehler handler
-								} catch (SQLException e1) {
-									e1.printStackTrace();
-								} catch (FileNotFoundException e1) {
-									e1.printStackTrace();
-								} catch (IOException e1) {
-									e1.printStackTrace();
-								}
-							dbm.closeConnection();
-						}
-					}else {
-				//Schließt fenster und öffnet MainView falls DB schon besteht
-				dispose();
-				new MainView(dbm.getUser(), dbm.getPassword(), dbm.getHost()).setVisible(true);
+						loginAktion();
 				}
-				dbm.closeConnection();
-				}			}
 		});
 		
 		//Beenden Button
@@ -140,11 +117,27 @@ public class AnmeldungGui extends JFrame {
 			}
 		});
 		
+		
+		//Rest Gui -------------------------------------------------------------------------------------------------
 		passwordField = new JPasswordField();
+		passwordField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode()==KeyEvent.VK_ENTER){
+				      loginAktion();
+				    }
+			}
+		});
 		
 		JLabel lblHost = new JLabel("Host");
 		
 		txtHost = new JTextField();
+		txtHost.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				loginAktion();
+			}
+		});
 		txtHost.setText("localhost");
 		txtHost.setColumns(10);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
@@ -195,5 +188,45 @@ public class AnmeldungGui extends JFrame {
 					.addContainerGap(42, Short.MAX_VALUE))
 		);
 		contentPane.setLayout(gl_contentPane);
+	}
+	
+	
+	
+	private void loginAktion() {
+		//DB datenübermittlung
+		dbm = new DBManager(txtBenutzername.getText(), String.valueOf(passwordField.getPassword()),txtHost.getText());
+		//Verbindungsaufbau
+		if (dbm.startConnect("")) {
+			//Überprüfung ob DB und Tabellen exisitieren
+			if (!dbm.tableExist(dbm.getConnection(), "kunden") || !dbm.databaseExist(dbm.getConnection())) {
+				//Dialog Popup
+				int dialogButton = JOptionPane.YES_NO_OPTION;
+				int dialogResult = JOptionPane.showConfirmDialog (null, "Keine CRM Datenbank gefunden! Soll eine erstellt werden?","Warning",dialogButton);
+				if(dialogResult == JOptionPane.YES_OPTION){
+						try {
+							//DB Erstellung mit sql script
+							ScriptRunner runner = new ScriptRunner(dbm.getConnection(), false, true);
+							runner.runScript(new BufferedReader(new FileReader("src/init.sql")));
+							System.out.println("DB eingefügt");
+							//Schließt fenster und öffnet MainView falls DB nichht besteht
+							dispose();
+							new MainView(dbm.getUser(), dbm.getPassword(), dbm.getHost()).setVisible(true);
+							//Fehler handler
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+						} catch (FileNotFoundException e1) {
+							e1.printStackTrace();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					dbm.closeConnection();
+				}
+			}else {
+		//Schließt fenster und öffnet MainView falls DB schon besteht
+		dispose();
+		new MainView(dbm.getUser(), dbm.getPassword(), dbm.getHost()).setVisible(true);
+		}
+		dbm.closeConnection();
+		}	
 	}
 }

@@ -18,7 +18,7 @@ USE `crm` ;
 -- Table `crm`.`ort`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `crm`.`ort` (
-  `ortNr` INT NOT NULL,
+  `ortNr` INT NOT NULL AUTO_INCREMENT,
   `ortName` VARCHAR(45) NULL,
   `plz` VARCHAR(6) NULL,
   PRIMARY KEY (`ortNr`))
@@ -29,7 +29,7 @@ ENGINE = InnoDB;
 -- Table `crm`.`kunden`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `crm`.`kunden` (
-  `kundenNr` INT NOT NULL,
+  `kundenNr` INT NOT NULL AUTO_INCREMENT,
   `vorname` VARCHAR(45) NULL,
   `name` VARCHAR(45) NULL,
   `email` VARCHAR(45) NULL,
@@ -55,7 +55,7 @@ ENGINE = InnoDB;
 -- Table `crm`.`auftraege`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `crm`.`auftraege` (
-  `auftraegeNr` INT NOT NULL,
+  `auftraegeNr` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NULL,
   `start` DATE NULL,
   `ende` DATE NULL,
@@ -76,7 +76,7 @@ ENGINE = InnoDB;
 -- Table `crm`.`termine`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `crm`.`termine` (
-  `termineNr` INT NOT NULL,
+  `termineNr` INT NOT NULL AUTO_INCREMENT,
   `datum` DATE NULL,
   `uhrzeit` TIME NULL,
   `bemerkung` INT NULL,

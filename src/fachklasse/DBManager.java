@@ -78,7 +78,6 @@ public class DBManager {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e, "Fehler", JOptionPane.ERROR_MESSAGE);
-			System.out.println(e.getSQLState());
 		}
 	}
 	
@@ -88,13 +87,10 @@ public class DBManager {
 		ResultSet tables = dbm.getTables(null, null, tableName, null);
 		if (tables.next()) {
 		  //Tabelle exestiert
-			System.out.println("Tabelle exestiert");
 			return true;
 		}
 		else {
 		  //Tabelle exestiert nicht
-			System.out.println("Tabelle exestiert nicht");
-
 			return false;
 		}
 		}catch (Exception e) {
@@ -111,10 +107,10 @@ public class DBManager {
 	   
 	        while(rs.next()){
 	            if ("crm".equals(rs.getString(1))) {
-	     		   System.out.println("true");
+	            	//DB existiert
 	     		   return true;
 	     	   }else {
-	     		   System.out.println("false");
+	     		//DB existiert nicht
 	     		   return false;
 	     	   }
 	        }

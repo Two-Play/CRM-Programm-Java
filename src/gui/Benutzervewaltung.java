@@ -23,51 +23,113 @@ import javax.swing.table.TableModel;
 
 import extern.ButtonColumn;
 import fachklasse.DBManager;
+import javax.swing.JSeparator;
+import java.awt.Component;
+import javax.swing.Box;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
+import javax.swing.JLabel;
+import java.awt.Font;
+import javax.swing.JTextField;
 
 public class Benutzervewaltung extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 	private JTable table;
 
-	private static DBManager dbm = null;
+	private JTextField textFieldBenutzername;
+	private JTextField textFieldPasswort;
+	private JTextField textField;
 
-	
-	public static void main(String[] args) {
-		try {
-			Benutzervewaltung dialog = new Benutzervewaltung();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-	}
+	private static DBManager dbm = null;
 
 	/**
 	 * Create the dialog.
 	 */
 	public Benutzervewaltung(String benutzer, String passwort, String host) {
+		setTitle("Benutzerverwaltung");
 		dbm = new DBManager(benutzer, passwort, host);
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setModal(true);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
-		setBounds(100, 100, 637, 435);
+		setBounds(100, 100, 691, 435);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		JScrollPane scrollPane = new JScrollPane();
+		
+		JSeparator separator = new JSeparator();
+		separator.setOrientation(SwingConstants.VERTICAL);
+		
+		JLabel lblBenutzerErstellen = new JLabel("Benutzer erstellen");
+		lblBenutzerErstellen.setHorizontalAlignment(SwingConstants.CENTER);
+		lblBenutzerErstellen.setFont(new Font("Tahoma", Font.BOLD, 29));
+		
+		JLabel lblBenutzername = new JLabel("Benutzername");
+		
+		textFieldBenutzername = new JTextField();
+		textFieldBenutzername.setColumns(10);
+		
+		JLabel lblPasswort = new JLabel("Passwort");
+		
+		textFieldPasswort = new JTextField();
+		textFieldPasswort.setColumns(10);
+		
+		JLabel lblHost = new JLabel("Host");
+		
+		textField = new JTextField();
+		textField.setColumns(10);
+		
+		JButton btnErstellen = new JButton("Erstellen");
+		
+		JButton btnSchliessen = new JButton("Schließen");
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 591, Short.MAX_VALUE)
-					.addContainerGap())
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(separator, GroupLayout.PREFERRED_SIZE, 5, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+							.addComponent(lblPasswort, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
+							.addComponent(lblBenutzername, GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
+							.addComponent(btnErstellen, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+							.addComponent(btnSchliessen, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+							.addComponent(textFieldBenutzername, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+							.addComponent(lblBenutzerErstellen, GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+							.addComponent(textFieldPasswort, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+							.addComponent(textField, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE))
+						.addComponent(lblHost, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE))
+					.addGap(29))
 		);
 		gl_contentPanel.setVerticalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_contentPanel.createSequentialGroup()
-					.addGap(111)
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
+				.addGroup(gl_contentPanel.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addComponent(lblBenutzerErstellen)
+							.addGap(18)
+							.addComponent(lblBenutzername)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(textFieldBenutzername, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addComponent(lblPasswort)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(textFieldPasswort, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addComponent(lblHost)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
+							.addComponent(btnErstellen)
+							.addGap(18)
+							.addComponent(btnSchliessen))
+						.addComponent(separator, GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE)
+						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		
@@ -85,23 +147,35 @@ public class Benutzervewaltung extends JDialog {
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
+			boolean[] columnEditables = new boolean[] {
+				false, false, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
 		});
 		scrollPane.setViewportView(table);
 		contentPanel.setLayout(gl_contentPanel);
 		
+		//Button action event Löschen
 		Action delete = new AbstractAction()
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
+		    	//Tabelle suche (quelle + reihe)
 		        JTable table = (JTable)e.getSource();
 		        int modelRow = Integer.valueOf( e.getActionCommand() );
 		        
+		        //Get benutzer und host von der Quelle
 		        String benutzer = (String) table.getModel().getValueAt(modelRow, 0);
 		        String host = (String) table.getModel().getValueAt(modelRow, 1);
-		        dbm.startConnect("");
+		        
 		        try {
+		        	//Löscht benutzer
+		        	dbm.startConnect("");
 					dbm.getStatement().executeUpdate("DROP USER '"+benutzer+"'@'"+host+"';");
 					((DefaultTableModel)table.getModel()).removeRow(modelRow);
+					dbm.closeConnection();
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -110,6 +184,7 @@ public class Benutzervewaltung extends JDialog {
 		    }
 		};
 		try {
+			//Listet alle relevante Benutzer auf (Tabelle)
 			dbm.startConnect("");
 			ResultSet rs = dbm.getStatement().executeQuery("select User, Host from mysql.user where not User=\"root\" and not User=\"mysql.infoschema\" and not User=\"mysql.session\" and not User=\"mysql.sys\" and not User='"+benutzer+"';");
 			while(rs.next()){
@@ -124,9 +199,4 @@ public class Benutzervewaltung extends JDialog {
 			e.printStackTrace();
 		}
 	}
-	
-	public Benutzervewaltung() {
-		System.exit(0);
-	}
-
 }
