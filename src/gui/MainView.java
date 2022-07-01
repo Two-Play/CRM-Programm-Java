@@ -26,37 +26,10 @@ public class MainView extends JFrame {
 	private JPanel contentPane;
 	private JTextField txtbenutzer;
 
-	private String host;
-	private String user;
-	private String password;
 	private JTable table;
 	
+	private DBManager dbm = null;
 	
-	
-	
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public String getUser() {
-		return user;
-	}
-
-	public void setUser(String user) {
-		this.user = user;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -74,9 +47,8 @@ public class MainView extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MainView() {
-		DBManager dbm = new DBManager();
-		
+	public MainView(String benutzer, String passwort, String host) {	
+		dbm = new DBManager(benutzer, passwort, host);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 738, 486);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
@@ -91,12 +63,11 @@ public class MainView extends JFrame {
 		txtbenutzer.setText("[Benutzer]");
 		txtbenutzer.setEditable(false);
 		txtbenutzer.setColumns(10);
-		
+		txtbenutzer.setText(benutzer);
 		JButton btnBenutzerverwaltung = new JButton("Benutzerverwaltung");
 		btnBenutzerverwaltung.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Benutzervewaltung bnv = new Benutzervewaltung();
-				bnv.setVisible(true);
+				new Benutzervewaltung(dbm.getUser(), dbm.getPassword(), dbm.getHost()).setVisible(true);
 				}
 		});
 		
@@ -105,9 +76,9 @@ public class MainView extends JFrame {
 		JButton btnAbmelden = new JButton("Abmelden");
 		btnAbmelden.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				//Abmeldung durchführen
 				if (dbm.getConnection() != null) {
 					dbm.closeConnection();
-					System.out.println("tets");
 				}
 				dispose();
 				new AnmeldungGui().setVisible(true);
@@ -117,7 +88,8 @@ public class MainView extends JFrame {
 		JButton btnNeuerKunde = new JButton("Neuer Kunde anlegen");
 		btnNeuerKunde.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new NeuerKunde().setVisible(true);
+				//Neuer Kunde Fenster öffnen
+				new NeuerKunde(dbm.getUser(), dbm.getPassword(), dbm.getHost()).setVisible(true);
 			}
 		});
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
@@ -154,6 +126,7 @@ public class MainView extends JFrame {
 					.addContainerGap())
 		);
 		
+		//Tabelle
 		table = new JTable();
 		table.setModel(new DefaultTableModel(
 			new Object[][] {
@@ -173,11 +146,8 @@ public class MainView extends JFrame {
 		contentPane.setLayout(gl_contentPane);
 	}
 
-	MainView(String benutzer, String passwort, String host) {
-		this();
-		setUser(benutzer);
-		setPassword(passwort);
-		setHost(host);
-		txtbenutzer.setText(getUser());
+	//parameter empfang
+	public MainView() {
+		System.exit(0);
 	}
 }

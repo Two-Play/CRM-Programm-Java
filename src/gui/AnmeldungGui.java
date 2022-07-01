@@ -43,6 +43,7 @@ public class AnmeldungGui extends JFrame {
 	private JPasswordField passwordField;
 	private JTextField txtHost;
 	
+	private DBManager dbm = null;
 	
 	public static void main(String[] args) {
 		try {
@@ -67,7 +68,7 @@ public class AnmeldungGui extends JFrame {
 	 * Create the frame.
 	 */
 	public AnmeldungGui() {
-		DBManager dbm = new DBManager();
+		
 		//init Gui
 		setResizable(false);
 		setType(Type.POPUP);
@@ -95,9 +96,7 @@ public class AnmeldungGui extends JFrame {
 		btnAnmelden.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//DB datenübermittlung
-				dbm.setUser(txtBenutzername.getText());
-				dbm.setPassword(String.valueOf(passwordField.getPassword()));
-				dbm.setHost(txtHost.getText());
+				dbm = new DBManager(txtBenutzername.getText(), String.valueOf(passwordField.getPassword()),txtHost.getText());
 				//Verbindungsaufbau
 				if (dbm.startConnect("")) {
 					//Überprüfung ob DB und Tabellen exisitieren

@@ -34,6 +34,26 @@ public class DBManager {
 		this.password = password;
 	}
 	
+	public Statement getStatement() {
+		return statement;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+	
+	//Konstruktor
+	public DBManager(String user, String password, String host) {
+		super();
+		this.host = host;
+		this.user = user;
+		this.password = password;
+	}
+	
 
 	public boolean startConnect(String db) {
 		try {
@@ -67,13 +87,13 @@ public class DBManager {
 		DatabaseMetaData dbm = con.getMetaData();
 		ResultSet tables = dbm.getTables(null, null, tableName, null);
 		if (tables.next()) {
-		  // Table exists
-			System.out.println("exestiert");
+		  //Tabelle exestiert
+			System.out.println("Tabelle exestiert");
 			return true;
 		}
 		else {
-		  // Table does not exist
-			System.out.println("exestiert nicht");
+		  //Tabelle exestiert nicht
+			System.out.println("Tabelle exestiert nicht");
 
 			return false;
 		}
@@ -83,6 +103,7 @@ public class DBManager {
 		return false;
 	}
 	
+
 	public boolean databaseExist(Connection con) {
 		String sql = "SHOW DATABASES LIKE 'crm'";
 	    try (Statement stmt = con.createStatement()) {
@@ -103,19 +124,5 @@ public class DBManager {
 	      }
 	   return false;
 	}
-
-	public Statement getStatement() {
-		return statement;
-	}
-
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-	
-	
 
 }
