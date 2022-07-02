@@ -17,6 +17,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import java.awt.Window.Type;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JSeparator;
@@ -237,20 +238,25 @@ public class NeuerKunde extends JDialog {
 		
 		btnAnlegen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String ortNr = null;
 				dbm.startConnect("crm");
-				String q = "select ortNr from crm.ort where ortName = '"+comboBox_1.getSelectedItem().toString()+"';";
-				System.out.println(q);
 				try {
-					ResultSet rs = dbm.getStatement().executeQuery(q);
-					while (rs.next()) {
+					ResultSet rs = dbm.getStatement().executeQuery("select ortNr from crm.ort where ortName = '"+comboBox_1.getSelectedItem().toString()+"';");
+					if (!rs.next()) {
+						ortNr = rs.getString(1);
+					}
+					String gebTag = textFieldGeburtsdatum.getText().isEmpty()? "0000-00-00":textFieldGeburtsdatum.getText();
 					dbm.getStatement().executeUpdate("insert into crm.kunden(name, vorname, firma, email, tel, strasse, bemerkungen, interessen, geburtsdatum, geschlecht,ortNr) values ('"+textFieldName.getText()+
 							"', '"+textFieldVorname.getText()+"', '"+textFieldFirma.getText()+"', '"+textFieldEmail.getText()+"', '"+textFieldTelefonnummer.getText()+
-							"', '"+textFieldStrasse.getText()+"', '"+textAreaBemerkung.getText()+"','"+textAreaInteresse.getText()+"','"+textFieldGeburtsdatum.getText()+"','"+comboBox.getSelectedItem()+", '"+rs.getString(1)+"');");
-					}
+							"', '"+textFieldStrasse.getText()+"', '"+textAreaBemerkung.getText()+"','"+textAreaInteresse.getText()+"','"+gebTag+"','"+comboBox.getSelectedItem()+"', '"+rs.getString(1)+"');");
+					rs.close();
+					dbm.closeConnection();
+
 				} catch (SQLException e1) {
+					JOptionPane.showMessageDialog(null, e1, "Fehler", JOptionPane.ERROR_MESSAGE);
 					e1.printStackTrace();
 				}
-				dbm.closeConnection();
+				
 			}
 		});
 	}

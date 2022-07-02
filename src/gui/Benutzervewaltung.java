@@ -155,8 +155,7 @@ public class Benutzervewaltung extends JDialog {
 		contentPanel.setLayout(gl_contentPanel);
 		
 		//Button action event Löschen
-		Action delete = new AbstractAction()
-		{
+		Action deleteAction = new AbstractAction() {
 			public void actionPerformed(ActionEvent e)
 		    {
 		    	//Tabelle suche (quelle + reihe)
@@ -186,10 +185,9 @@ public class Benutzervewaltung extends JDialog {
 			dbm.startConnect("");
 			ResultSet rs = dbm.getStatement().executeQuery("select User, Host from mysql.user where not User=\"root\" and not User=\"mysql.infoschema\" and not User=\"mysql.session\" and not User=\"mysql.sys\" and not User='"+dbm.getUser()+"';");
 			while(rs.next()){
-				new ButtonColumn(table, delete, 2);
+				new ButtonColumn(table, deleteAction, 2);
 		        String data[] = {rs.getString(1),rs.getString(2),"Löschen"};
 		        DefaultTableModel tbm = (DefaultTableModel) table.getModel();
-		        
 		        tbm.addRow(data);
 		    }
 			dbm.closeConnection();

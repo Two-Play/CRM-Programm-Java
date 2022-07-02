@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `crm`.`termine` (
   `termineNr` INT NOT NULL AUTO_INCREMENT,
   `datum` DATE NULL,
   `uhrzeit` TIME NULL,
-  `bemerkung` INT NULL,
+  `bemerkung` VARCHAR(45) NULL,
   `kundenNr` INT NOT NULL,
   PRIMARY KEY (`termineNr`),
   INDEX `fk_termine1_idx` (`kundenNr` ASC) VISIBLE,

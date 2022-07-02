@@ -93,8 +93,18 @@ public class MainView extends JFrame {
 		});
 		
 		JButton btnAuftrag = new JButton("Auftäge anzeigen");
+		btnAuftrag.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new Auftraege(dbm).setVisible(true);;
+			}
+		});
 		
 		JButton btnNewButton = new JButton("Neuer Aufttrag erstellen");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new NeueAuftraege(dbm).setVisible(true);
+			}
+		});
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -199,6 +209,7 @@ public class MainView extends JFrame {
 				        
 				        tbm.addRow(data);
 				    }
+					rs.close();
 					dbm.closeConnection();
 				} catch (SQLException e1) {
 					e1.printStackTrace();
