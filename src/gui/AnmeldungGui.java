@@ -201,7 +201,7 @@ public class AnmeldungGui extends JFrame {
 			if (!dbm.tableExist(dbm.getConnection(), "kunden") || !dbm.databaseExist(dbm.getConnection())) {
 				//Dialog Popup
 				int dialogButton = JOptionPane.YES_NO_OPTION;
-				int dialogResult = JOptionPane.showConfirmDialog (null, "Keine CRM Datenbank gefunden! Soll eine erstellt werden?","Warning",dialogButton);
+				int dialogResult = JOptionPane.showConfirmDialog (null, "Keine CRM Datenbank gefunden! Soll eine erstellt werden?","Warnung",dialogButton);
 				if(dialogResult == JOptionPane.YES_OPTION){
 						try {
 							//DB Erstellung mit sql script
@@ -210,7 +210,7 @@ public class AnmeldungGui extends JFrame {
 							System.out.println("DB eingefügt");
 							//Schließt fenster und öffnet MainView falls DB nichht besteht
 							dispose();
-							new MainView(dbm.getUser(), dbm.getPassword(), dbm.getHost()).setVisible(true);
+							new MainView(dbm).setVisible(true);
 							//Fehler handler
 						} catch (SQLException e1) {
 							e1.printStackTrace();
@@ -224,7 +224,7 @@ public class AnmeldungGui extends JFrame {
 			}else {
 		//Schließt fenster und öffnet MainView falls DB schon besteht
 		dispose();
-		new MainView(dbm.getUser(), dbm.getPassword(), dbm.getHost()).setVisible(true);
+		new MainView(dbm).setVisible(true);
 		}
 		dbm.closeConnection();
 		}	

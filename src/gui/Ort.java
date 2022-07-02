@@ -26,7 +26,7 @@ public class Ort extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public Ort(String benutzer, String passwort, String host) {
+	public Ort(DBManager dbm) {
 		setType(Type.POPUP);
 		setTitle("Ort Anlegen");
 		setBounds(100, 100, 359, 133);
@@ -47,7 +47,6 @@ public class Ort extends JDialog {
 		JButton btnHinzufuegen = new JButton("Hinzufügen");
 		btnHinzufuegen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				DBManager dbm = new DBManager(benutzer, passwort, host);
 				dbm.startConnect("crm");
 				try {
 					dbm.getStatement().executeUpdate("insert into crm.ort(ortName, plz) values ('"+textFieldOrt.getText()+"', '"+textFieldPlz.getText()+"');");

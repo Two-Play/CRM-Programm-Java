@@ -34,23 +34,20 @@ import java.awt.event.FocusEvent;
 
 public class NeuerKunde extends JDialog {
 
-
-	private DBManager dbm = null;
 	private JTextField textFieldName;
 	private JTextField textFieldVorname;
 	private JTextField textFieldFirma;
 	private JTextField textFieldTelefonnummer;
 	private JTextField textFieldEmail;
 	private JTextField textFieldGeburtsdatum;
-	private JTextField textField;
+	private JTextField textFieldStrasse;
 
 	/**
 	 * Create the dialog.
 	 */
-	public NeuerKunde(String benutzer, String passwort, String host) {
+	public NeuerKunde(DBManager dbm) {
 		setTitle("Neuer Kunde anlegen");
 		setType(Type.POPUP);
-		dbm = new DBManager(benutzer, passwort, host);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 315, 650);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
@@ -104,16 +101,12 @@ public class NeuerKunde extends JDialog {
 		JScrollPane scrollPane_1 = new JScrollPane();
 		
 		JButton btnAnlegen = new JButton("Anlegen");
-		btnAnlegen.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
+	
 		
 		JLabel lblStrasse = new JLabel("Straße mit Hausnummer");
 		
-		textField = new JTextField();
-		textField.setColumns(10);
+		textFieldStrasse = new JTextField();
+		textFieldStrasse.setColumns(10);
 		
 		JLabel lblOrt = new JLabel("Ort");
 		
@@ -132,7 +125,7 @@ public class NeuerKunde extends JDialog {
 		JButton btnNewButton = new JButton("Ort anlegen");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new Ort(dbm.getUser(),dbm.getPassword(), dbm.getHost()).setVisible(true);
+				new Ort(dbm).setVisible(true);
 			}
 		});
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
@@ -143,7 +136,7 @@ public class NeuerKunde extends JDialog {
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(lblStrasse, GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
 						.addComponent(lblOrt, GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
-						.addComponent(textField, GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+						.addComponent(textFieldStrasse, GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
 						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
 						.addComponent(lblTelefonnummer, GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
 						.addComponent(textFieldTelefonnummer, GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
@@ -199,7 +192,7 @@ public class NeuerKunde extends JDialog {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblStrasse)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addComponent(textFieldStrasse, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblOrt)
 					.addGap(4)
@@ -241,5 +234,24 @@ public class NeuerKunde extends JDialog {
 		JTextArea textAreaBemerkung = new JTextArea();
 		scrollPane.setViewportView(textAreaBemerkung);
 		getContentPane().setLayout(groupLayout);
+		
+		btnAnlegen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dbm.startConnect("crm");
+				String q = "select ortNr from crm.ort where ortName = '"+comboBox_1.getSelectedItem().toString()+"';";
+				System.out.println(q);
+				try {
+					ResultSet rs = dbm.getStatement().executeQuery(q);
+					while (rs.next()) {
+					dbm.getStatement().executeUpdate("insert into crm.kunden(name, vorname, firma, email, tel, strasse, bemerkungen, interessen, geburtsdatum, geschlecht,ortNr) values ('"+textFieldName.getText()+
+							"', '"+textFieldVorname.getText()+"', '"+textFieldFirma.getText()+"', '"+textFieldEmail.getText()+"', '"+textFieldTelefonnummer.getText()+
+							"', '"+textFieldStrasse.getText()+"', '"+textAreaBemerkung.getText()+"','"+textAreaInteresse.getText()+"','"+textFieldGeburtsdatum.getText()+"','"+comboBox.getSelectedItem()+", '"+rs.getString(1)+"');");
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+				dbm.closeConnection();
+			}
+		});
 	}
 }

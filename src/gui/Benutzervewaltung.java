@@ -41,14 +41,11 @@ public class Benutzervewaltung extends JDialog {
 	private JTextField textFieldPasswort;
 	private JTextField textField;
 
-	private static DBManager dbm = null;
-
 	/**
 	 * Create the dialog.
 	 */
-	public Benutzervewaltung(String benutzer, String passwort, String host) {
+	public Benutzervewaltung(DBManager dbm) {
 		setTitle("Benutzerverwaltung");
-		dbm = new DBManager(benutzer, passwort, host);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setModal(true);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
@@ -160,7 +157,7 @@ public class Benutzervewaltung extends JDialog {
 		//Button action event Löschen
 		Action delete = new AbstractAction()
 		{
-		    public void actionPerformed(ActionEvent e)
+			public void actionPerformed(ActionEvent e)
 		    {
 		    	//Tabelle suche (quelle + reihe)
 		        JTable table = (JTable)e.getSource();
@@ -169,11 +166,12 @@ public class Benutzervewaltung extends JDialog {
 		        //Get benutzer und host von der Quelle
 		        String benutzer = (String) table.getModel().getValueAt(modelRow, 0);
 		        String host = (String) table.getModel().getValueAt(modelRow, 1);
-		        
+		        System.out.println("gadfjk");
 		        try {
 		        	//Löscht benutzer
 		        	dbm.startConnect("");
 					dbm.getStatement().executeUpdate("DROP USER '"+benutzer+"'@'"+host+"';");
+					System.out.println("Benutzer gelöscht!");
 					((DefaultTableModel)table.getModel()).removeRow(modelRow);
 					dbm.closeConnection();
 				} catch (SQLException e1) {
@@ -186,7 +184,7 @@ public class Benutzervewaltung extends JDialog {
 		try {
 			//Listet alle relevante Benutzer auf (Tabelle)
 			dbm.startConnect("");
-			ResultSet rs = dbm.getStatement().executeQuery("select User, Host from mysql.user where not User=\"root\" and not User=\"mysql.infoschema\" and not User=\"mysql.session\" and not User=\"mysql.sys\" and not User='"+benutzer+"';");
+			ResultSet rs = dbm.getStatement().executeQuery("select User, Host from mysql.user where not User=\"root\" and not User=\"mysql.infoschema\" and not User=\"mysql.session\" and not User=\"mysql.sys\" and not User='"+dbm.getUser()+"';");
 			while(rs.next()){
 				new ButtonColumn(table, delete, 2);
 		        String data[] = {rs.getString(1),rs.getString(2),"Löschen"};

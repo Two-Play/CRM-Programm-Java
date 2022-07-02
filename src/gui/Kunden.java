@@ -17,6 +17,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import java.awt.Window.Type;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JSeparator;
@@ -32,27 +33,27 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.Color;
 
 public class Kunden extends JDialog {
 
-
-	private DBManager dbm = null;
 	private JTextField textFieldName;
 	private JTextField textFieldVorname;
 	private JTextField textFieldFirma;
 	private JTextField textFieldTelefonnummer;
 	private JTextField textFieldEmail;
 	private JTextField textFieldGeburtsdatum;
-	private JTable table;
-	private JTextField textField;
+	private JTable tableAuftrag;
+	private JTextField textFieldStrasse;
+	private JTable tableTermin;
+	private JTextField textFieldKundenNr;
 
 	/**
 	 * Create the dialog.
 	 */
-	public Kunden(String benutzer, String passwort, String host) {
+	public Kunden(DBManager dbm, String kundenNr) {
 		setTitle("Kunde bearbeiten");
 		setType(Type.POPUP);
-		dbm = new DBManager(benutzer, passwort, host);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 750, 650);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
@@ -105,7 +106,7 @@ public class Kunden extends JDialog {
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		
-		JButton btnAnlegen = new JButton("Anlegen");
+		JButton btnAktualisieren = new JButton("Aktualisieren");
 		
 		JSeparator separator_2 = new JSeparator();
 		separator_2.setOrientation(SwingConstants.VERTICAL);
@@ -114,8 +115,8 @@ public class Kunden extends JDialog {
 		
 		JLabel lblStrasse = new JLabel("Straße mit Hausnummer");
 		
-		textField = new JTextField();
-		textField.setColumns(10);
+		textFieldStrasse = new JTextField();
+		textFieldStrasse.setColumns(10);
 		
 		JLabel lblOrt = new JLabel("Ort");
 		
@@ -123,6 +124,18 @@ public class Kunden extends JDialog {
 		JComboBox comboBox_1 = new JComboBox();
 		
 		Utility ut = new Utility();
+		
+		dbm.startConnect("crm");
+        try {
+				ResultSet rs = dbm.getStatement().executeQuery("SELECT * FROM crm.kunden, crm.ort where kunden.ortNr = ort.ortNr and kundenNr = '"+kundenNr+"';");
+				while(rs.next()){
+			        
+			    }
+				dbm.closeConnection();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		
 		ut.updateOrt(comboBox_1, dbm);	
 		comboBox_1.addFocusListener(new FocusAdapter() {
 			@Override
@@ -135,72 +148,115 @@ public class Kunden extends JDialog {
 		JButton btnNewButton = new JButton("Ort anlegen");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new Ort(dbm.getUser(),dbm.getPassword(), dbm.getHost()).setVisible(true);
+				new Ort(dbm).setVisible(true);
 			}
 		});
+		
+		JButton btnLoeschen = new JButton("Kunde Löschen");
+		btnLoeschen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int dialogButton = JOptionPane.YES_NO_OPTION;
+				int dialogResult = JOptionPane.showConfirmDialog (null, "Sind Sie sicher, dass Sie "+textFieldVorname.getText() + " "+ textFieldName.getText()+" Löschen möchten?", "Warnung" , dialogButton, JOptionPane.WARNING_MESSAGE);
+				if(dialogResult == JOptionPane.YES_OPTION){
+				dbm.startConnect("crm");
+				try {
+					dbm.getStatement().executeUpdate("delete FROM crm.auftraege where kundenNr = "+textFieldKundenNr.getText()+";" );
+					dbm.getStatement().executeUpdate("delete FROM crm.termine where kundenNr = "+textFieldKundenNr.getText()+";" );
+					dbm.getStatement().executeUpdate("delete FROM crm.kunden where kundenNr = "+textFieldKundenNr.getText()+";" );
+					JOptionPane.showMessageDialog(null, "Löschung war erfolgreich", "Info", JOptionPane.INFORMATION_MESSAGE);
+					dispose();
+				} catch (SQLException e1) {
+					JOptionPane.showMessageDialog(null, e1, "Fehler", JOptionPane.ERROR_MESSAGE);
+					e1.printStackTrace();
+				}
+				     
+				}
+			}
+		});
+		btnLoeschen.setForeground(new Color(255, 51, 51));
+		btnLoeschen.setBackground(new Color(255, 51, 51));
+		
+		JScrollPane scrollPane_3 = new JScrollPane();
+		
+		JLabel lblNewLabel_1 = new JLabel("KundenNr");
+		
+		textFieldKundenNr = new JTextField();
+		textFieldKundenNr.setEditable(false);
+		textFieldKundenNr.setColumns(10);
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(lblInteressen, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblBemerkung, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+						.addComponent(lblInteressen, GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
+						.addComponent(lblBemerkung, GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
 						.addComponent(separator_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(textFieldEmail)
-						.addComponent(lblEmail, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(textFieldTelefonnummer)
-						.addComponent(lblTelefonnummer, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(lblEmail, GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
+						.addComponent(lblTelefonnummer, GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
 						.addComponent(separator, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(textFieldGeburtsdatum)
-						.addComponent(lblGeburtsdatum, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(btnAnlegen, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(lblGeburtsdatum, GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
 								.addComponent(comboBox, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(lblNewLabel, GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
 								.addComponent(lblName, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)))
+								.addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblNewLabel_1)
+								.addComponent(textFieldKundenNr, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE)))
 						.addGroup(groupLayout.createSequentialGroup()
-							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-								.addComponent(textFieldVorname, Alignment.LEADING)
-								.addComponent(lblVorname, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE))
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblVorname, GroupLayout.PREFERRED_SIZE, 166, GroupLayout.PREFERRED_SIZE)
+								.addComponent(textFieldVorname, GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE))
+							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblFirma, GroupLayout.PREFERRED_SIZE, 176, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textFieldFirma, GroupLayout.PREFERRED_SIZE, 181, GroupLayout.PREFERRED_SIZE)))
-						.addComponent(textField, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
-						.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-							.addComponent(comboBox_1, 0, 258, Short.MAX_VALUE)
+								.addComponent(textFieldFirma, GroupLayout.DEFAULT_SIZE, 181, Short.MAX_VALUE)))
+						.addComponent(textFieldStrasse, GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(comboBox_1, 0, 267, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(btnNewButton, GroupLayout.PREFERRED_SIZE, 98, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED))
-						.addComponent(lblOrt, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
-						.addComponent(lblStrasse, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
-						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
-						.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE))
+						.addComponent(lblOrt, GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
+						.addComponent(lblStrasse, GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
+						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
+						.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(btnAktualisieren, GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnLoeschen, GroupLayout.DEFAULT_SIZE, 181, Short.MAX_VALUE))
+						.addComponent(textFieldGeburtsdatum, GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
+						.addComponent(textFieldTelefonnummer, GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
+						.addComponent(textFieldEmail, GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE))
 					.addGap(18)
 					.addComponent(separator_2, GroupLayout.PREFERRED_SIZE, 9, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
+						.addComponent(scrollPane_3, GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(separator_2, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(separator_2, GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblNewLabel)
-								.addComponent(lblName))
+								.addComponent(lblName)
+								.addComponent(lblNewLabel_1))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 								.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(textFieldKundenNr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblVorname)
@@ -212,7 +268,7 @@ public class Kunden extends JDialog {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(lblStrasse)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(textFieldStrasse, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(lblOrt)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -238,19 +294,42 @@ public class Kunden extends JDialog {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(lblBemerkung)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
+							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(lblInteressen)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
+							.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)
 							.addGap(18)
-							.addComponent(btnAnlegen))
-						.addComponent(scrollPane_2))
-					.addContainerGap(12, Short.MAX_VALUE))
+							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+								.addComponent(btnAktualisieren)
+								.addComponent(btnLoeschen))
+							.addGap(1))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(scrollPane_2, GroupLayout.PREFERRED_SIZE, 288, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+							.addComponent(scrollPane_3, GroupLayout.PREFERRED_SIZE, 294, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap())
 		);
 		
-		table = new JTable();
-		table.setModel(new DefaultTableModel(
+		tableTermin = new JTable();
+		tableTermin.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"Uhrzeit", "Datum", "Bemerkung"
+			}
+		) {
+			Class[] columnTypes = new Class[] {
+				String.class, String.class, String.class
+			};
+			public Class getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+		});
+		scrollPane_3.setViewportView(tableTermin);
+		
+		tableAuftrag = new JTable();
+		tableAuftrag.setModel(new DefaultTableModel(
 			new Object[][] {
 			},
 			new String[] {
@@ -270,7 +349,7 @@ public class Kunden extends JDialog {
 				return columnEditables[column];
 			}
 		});
-		scrollPane_2.setViewportView(table);
+		scrollPane_2.setViewportView(tableAuftrag);
 		
 		JTextArea textAreaInteresse = new JTextArea();
 		scrollPane_1.setViewportView(textAreaInteresse);
@@ -278,6 +357,46 @@ public class Kunden extends JDialog {
 		JTextArea textAreaBemerkung = new JTextArea();
 		scrollPane.setViewportView(textAreaBemerkung);
 		getContentPane().setLayout(groupLayout);
+		
+		
+		dbm.startConnect("crm");
+		try {
+			ResultSet rs = dbm.getStatement().executeQuery("SELECT * FROM crm.kunden, crm.ort where kunden.ortNr = ort.ortNr and kundenNr = '"+kundenNr+"';");
+			while (rs.next()) {
+	            textFieldVorname.setText(rs.getString(2));
+	            textFieldName.setText(rs.getString(3));
+	            textFieldEmail.setText(rs.getString(4));
+	            textFieldTelefonnummer.setText(rs.getString(5));
+	            textFieldFirma.setText(rs.getString(6));
+	            textFieldStrasse.setText(rs.getString(8));
+	            textAreaBemerkung.setText(rs.getString(9));
+	            textAreaInteresse.setText(rs.getString(10));
+	            textFieldGeburtsdatum.setText(rs.getString(11));
+	            comboBox.setSelectedItem(rs.getString(12));
+	            comboBox_1.setSelectedItem(rs.getString(14));
+	            textFieldKundenNr.setText(rs.getString(1));
+	        }
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		dbm.closeConnection();
+		
+		btnAktualisieren.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dbm.startConnect("crm");
+				try {
+					ResultSet rs = dbm.getStatement().executeQuery("select ortNr from crm.ort where ortName = '"+comboBox_1.getSelectedItem().toString()+"';");
+					while (rs.next()) {
+					dbm.getStatement().executeUpdate("update crm.kunden set name = '"+textFieldName.getText()+"', vorname ='"+textFieldVorname.getText()+
+							"', firma ='"+textFieldFirma.getText()+"', email ='"+textFieldEmail.getText()+"', tel ='"+textFieldTelefonnummer.getText()+
+							"', strasse ='"+textFieldStrasse.getText()+"', bemerkungen ='"+textAreaBemerkung.getText()+"', interessen ='"+textAreaInteresse.getText()+
+							"', geburtsdatum ='"+textFieldGeburtsdatum.getText()+"', geschlecht ='"+comboBox.getSelectedItem()+"',ortNr ='"+
+							rs.getString(1)+"'");}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+				dbm.closeConnection();
+			}
+		});
 	}
-	
 }
