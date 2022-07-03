@@ -31,6 +31,8 @@ import javax.swing.SwingConstants;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 public class Benutzervewaltung extends JDialog {
 
@@ -39,7 +41,6 @@ public class Benutzervewaltung extends JDialog {
 
 	private JTextField textFieldBenutzername;
 	private JTextField textFieldPasswort;
-	private JTextField textField;
 
 	/**
 	 * Create the dialog.
@@ -49,7 +50,7 @@ public class Benutzervewaltung extends JDialog {
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setModal(true);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
-		setBounds(100, 100, 691, 435);
+		setBounds(100, 100, 673, 353);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -74,33 +75,46 @@ public class Benutzervewaltung extends JDialog {
 		
 		JLabel lblHost = new JLabel("Host");
 		
-		textField = new JTextField();
-		textField.setColumns(10);
-		
 		JButton btnErstellen = new JButton("Erstellen");
 		
 		JButton btnSchliessen = new JButton("Schließen");
+		
+		JComboBox comboBox = new JComboBox();
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"%", "localhost"}));
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(separator, GroupLayout.PREFERRED_SIZE, 5, GroupLayout.PREFERRED_SIZE)
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
+					.addGap(13)
+					.addComponent(separator, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-							.addComponent(lblPasswort, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
-							.addComponent(lblBenutzername, GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
-							.addComponent(btnErstellen, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
-							.addComponent(btnSchliessen, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
-							.addComponent(textFieldBenutzername, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
-							.addComponent(lblBenutzerErstellen, GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
-							.addComponent(textFieldPasswort, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
-							.addComponent(textField, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE))
-						.addComponent(lblHost, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE))
-					.addGap(29))
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addComponent(textFieldPasswort, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addComponent(textFieldBenutzername, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addComponent(lblBenutzerErstellen, GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
+							.addGap(29))
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addComponent(lblBenutzername, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addComponent(lblPasswort, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addComponent(lblHost, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(Alignment.TRAILING, gl_contentPanel.createSequentialGroup()
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+								.addComponent(btnSchliessen, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+								.addComponent(btnErstellen, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+								.addComponent(comboBox, 0, 291, Short.MAX_VALUE))
+							.addContainerGap())))
 		);
 		gl_contentPanel.setVerticalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
@@ -108,26 +122,28 @@ public class Benutzervewaltung extends JDialog {
 					.addContainerGap()
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+							.addContainerGap())
+						.addComponent(separator, GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
+						.addGroup(gl_contentPanel.createSequentialGroup()
 							.addComponent(lblBenutzerErstellen)
-							.addGap(18)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(lblBenutzername)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(textFieldBenutzername, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
+							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(lblPasswort)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(textFieldPasswort, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
+							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(lblHost)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
+							.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addGap(43)
 							.addComponent(btnErstellen)
-							.addGap(18)
-							.addComponent(btnSchliessen))
-						.addComponent(separator, GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE)
-						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE))
-					.addContainerGap())
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnSchliessen)
+							.addContainerGap())))
 		);
 		
 		table = new JTable();

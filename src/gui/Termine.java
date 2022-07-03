@@ -2,6 +2,8 @@ package gui;
 
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
@@ -51,6 +53,21 @@ public class Termine extends JDialog {
 		scrollPane.setViewportView(table);
 
 
+		dbm.startConnect("crm");
+		try {
+			DefaultTableModel tbm = (DefaultTableModel) table.getModel();    
+			tbm.setRowCount(0);
+			ResultSet rs = dbm.getStatement().executeQuery("SELECT termine.*, kunden.name, vorname FROM crm.termine, crm.kunden where termine.kundenNr = kunden.kundenNr;");
+			while(rs.next()){
+				String kunde = rs.getString(7)+ ", " +rs.getString(6);
+		        String data[] = {kunde,rs.getString(3), rs.getString(2),rs.getString(4)};
+		        tbm.addRow(data);
+		    }
+
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		dbm.closeConnection();
 	}
 
 }

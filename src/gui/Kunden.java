@@ -33,7 +33,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.Color;
+import java.awt.event.WindowFocusListener;
+import java.awt.event.WindowEvent;
 
 public class Kunden extends JDialog {
 
@@ -52,6 +57,7 @@ public class Kunden extends JDialog {
 	 * Create the dialog.
 	 */
 	public Kunden(DBManager dbm, String kundenNr) {
+
 		setTitle("Kunde bearbeiten");
 		setType(Type.POPUP);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -171,6 +177,7 @@ public class Kunden extends JDialog {
 				}
 				     
 				}
+				dbm.closeConnection();
 			}
 		});
 		btnLoeschen.setForeground(new Color(255, 51, 51));
@@ -343,17 +350,17 @@ public class Kunden extends JDialog {
 			new Object[][] {
 			},
 			new String[] {
-				"Auftragname", "Status"
+				"AuftragsNr", "Auftragname", "Status"
 			}
 		) {
 			Class[] columnTypes = new Class[] {
-				String.class, String.class
+				String.class, String.class, String.class
 			};
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
 			boolean[] columnEditables = new boolean[] {
-				false, false
+				false, false, false
 			};
 			public boolean isCellEditable(int row, int column) {
 				return columnEditables[column];
@@ -418,9 +425,9 @@ public class Kunden extends JDialog {
 		
 		dbm.startConnect("crm");
 		try {
-			ResultSet rs = dbm.getStatement().executeQuery("SELECT auftraege.name, status  FROM crm.auftraege where auftraege.kundenNr = '"+textFieldKundenNr.getText()+"';");
+			ResultSet rs = dbm.getStatement().executeQuery("SELECT auftraege.name, status, auftraegeNr  FROM crm.auftraege where auftraege.kundenNr = '"+textFieldKundenNr.getText()+"';");
 			while(rs.next()){
-		        String data[] = {rs.getString(1), rs.getString(2)};
+		        String data[] = {rs.getString(3), rs.getString(1), rs.getString(2)};
 		        DefaultTableModel tbm = (DefaultTableModel) tableAuftrag.getModel();
 		        tbm.addRow(data);
 		    }
@@ -429,5 +436,39 @@ public class Kunden extends JDialog {
 			e.printStackTrace();
 		}
 		dbm.closeConnection();
+		
+		tableAuftrag.addMouseListener((MouseListener) new MouseAdapter() {
+	         public void mouseClicked(MouseEvent me) {
+	            if (me.getClickCount() == 2) {     // to detect doble click events
+	               JTable target = (JTable)me.getSource();
+	               int row = target.getSelectedRow(); // select a row
+	               String tableRow = (String) tableAuftrag.getValueAt(row, 0); // get the value of a row and column.
+	               System.out.println(tableRow);
+	               new AuftraegeBearbeiten(dbm, tableRow).setVisible(true);
+	               
+	            }
+	         }
+	      });
+		
+		addWindowFocusListener(new WindowFocusListener() {
+			public void windowGainedFocus(WindowEvent e) {
+				DefaultTableModel tbm = (DefaultTableModel) tableAuftrag.getModel();    
+				tbm.setRowCount(0);
+				dbm.startConnect("crm");
+				try {
+					ResultSet rs = dbm.getStatement().executeQuery("SELECT auftraege.name, status, auftraegeNr  FROM crm.auftraege where auftraege.kundenNr = '"+textFieldKundenNr.getText()+"';");
+					while(rs.next()){
+				        String data[] = {rs.getString(3), rs.getString(1), rs.getString(2)};
+				        tbm.addRow(data);
+				    }
+
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+				dbm.closeConnection();
+			}
+			public void windowLostFocus(WindowEvent e) {
+			}
+		});
 	}
 }

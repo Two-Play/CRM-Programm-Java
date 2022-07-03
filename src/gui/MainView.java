@@ -85,10 +85,16 @@ public class MainView extends JFrame {
 		});
 		
 		JButton btnTerminErstellen = new JButton("Neuer Termin erstellen");
+		btnTerminErstellen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new NeuerTermin(dbm).setVisible(true);
+			}
+		});
 		
 		JButton btnTermineAnz = new JButton("Termine anzeigen");
 		btnTermineAnz.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				new Termine(dbm).setVisible(true);
 			}
 		});
 		
