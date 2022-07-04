@@ -31,7 +31,7 @@ public class NeuerTermin extends JDialog {
 		setTitle("Termin erstellen");
 		setBounds(100, 100, 216, 334);
 		setModal(true);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/resources/icon.png")));
 		
 		JLabel lblNewLabel = new JLabel("Datum");
 		

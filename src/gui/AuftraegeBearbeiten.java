@@ -38,7 +38,7 @@ public class AuftraegeBearbeiten extends JDialog {
 		setTitle("Auftrag bearbeiten");
 		setBounds(100, 100, 317, 423);
 		setModal(true);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/resources/icon.png")));
 		
 		JLabel lblStartDatum = new JLabel("Start Datum (jjjj-mm-tt)");
 		

@@ -51,7 +51,7 @@ public class NeuerKunde extends JDialog {
 		setType(Type.POPUP);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 315, 650);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/resources/icon.png")));
 		setModal(true);
 		
 		JLabel lblName = new JLabel("Name");

@@ -33,6 +33,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
@@ -66,12 +67,6 @@ public class AnmeldungGui extends JFrame {
 			}
 		});
 	}
-
-	  public void keyPressed(KeyEvent e) {
-		    if (e.getKeyCode()==KeyEvent.VK_ENTER){
-		      JOptionPane.showMessageDialog(null , "Your form has been sent");
-		    }
-		  }
 	
 	/**
 	 * Create the frame.
@@ -81,7 +76,7 @@ public class AnmeldungGui extends JFrame {
 		//init Gui \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		setResizable(false);
 		setType(Type.POPUP);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/resources/icon.png")));
 		setTitle("CRM Programm");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 650, 380);
@@ -208,17 +203,20 @@ public class AnmeldungGui extends JFrame {
 						try {
 							//DB Erstellung mit sql script
 							ScriptRunner runner = new ScriptRunner(dbm.getConnection(), false, true);
-							runner.runScript(new BufferedReader(new FileReader("init.sql")));
+							runner.runScript(new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/resources/init.sql"))));
 							System.out.println("DB eingefügt");
 							//Schließt fenster und öffnet MainView falls DB nichht besteht
 							dispose();
 							new MainView(dbm).setVisible(true);
 							//Fehler handler
 						} catch (SQLException e1) {
+							JOptionPane.showMessageDialog(null, e1, "Fehler", JOptionPane.ERROR_MESSAGE);
 							e1.printStackTrace();
 						} catch (FileNotFoundException e1) {
+							JOptionPane.showMessageDialog(null, e1, "Fehler", JOptionPane.ERROR_MESSAGE);
 							e1.printStackTrace();
 						} catch (IOException e1) {
+							JOptionPane.showMessageDialog(null, e1, "Fehler", JOptionPane.ERROR_MESSAGE);
 							e1.printStackTrace();
 						}
 					dbm.closeConnection();

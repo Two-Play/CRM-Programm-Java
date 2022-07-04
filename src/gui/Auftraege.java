@@ -27,7 +27,7 @@ public class Auftraege extends JDialog {
 		setTitle("Aufträge");
 		setBounds(100, 100, 753, 320);
 		setModal(true);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/resources/icon.png")));
 		
 		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane, BorderLayout.CENTER);

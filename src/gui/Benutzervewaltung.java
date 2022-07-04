@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -33,6 +36,7 @@ import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import java.awt.event.ActionListener;
 
 public class Benutzervewaltung extends JDialog {
 
@@ -49,7 +53,7 @@ public class Benutzervewaltung extends JDialog {
 		setTitle("Benutzerverwaltung");
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setModal(true);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/resources/icon.png")));
 		setBounds(100, 100, 673, 353);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -77,7 +81,13 @@ public class Benutzervewaltung extends JDialog {
 		
 		JButton btnErstellen = new JButton("Erstellen");
 		
+		
 		JButton btnSchliessen = new JButton("Schließen");
+		btnSchliessen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
 		
 		JComboBox comboBox = new JComboBox();
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"%", "localhost"}));
@@ -196,14 +206,70 @@ public class Benutzervewaltung extends JDialog {
 				}
 		    }
 		};
+	
+		getData(dbm);
+		table.addMouseListener((MouseListener) new MouseAdapter() {
+	         public void mouseClicked(MouseEvent e) {
+	            if (e.getClickCount() == 2) {
+	            	int dialogButton = JOptionPane.YES_NO_OPTION;
+					int dialogResult = JOptionPane.showConfirmDialog (null, "Sind Sie sicher, dass Sie diesen Benutzer Löschen möchten?", "Warnung" , dialogButton, JOptionPane.WARNING_MESSAGE);
+					if(dialogResult == JOptionPane.YES_OPTION){
+	            	//Tabelle suche (quelle + reihe)
+	            	JTable target = (JTable)e.getSource();
+		               int row = target.getSelectedRow(); // select a row
+			        
+			        //Get benutzer und host von der Quelle
+			        String benutzer = (String) table.getModel().getValueAt(row, 0);
+			        String host = (String) table.getModel().getValueAt(row, 1);
+			        try {
+			        	//Löscht benutzer
+			        	dbm.startConnect("");
+						dbm.getStatement().executeUpdate("DROP USER '"+benutzer+"'@'"+host+"';");
+						System.out.println("Benutzer gelöscht!");
+						((DefaultTableModel)table.getModel()).removeRow(row);
+						dbm.closeConnection();
+						getData(dbm);
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+						JOptionPane.showMessageDialog(null, e1, "Fehler", JOptionPane.ERROR_MESSAGE);
+					}
+					}  
+	            }
+	         }
+	      });
+	
+		
+		btnErstellen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dbm.startConnect("");
+				try {
+					dbm.getStatement().executeUpdate("CREATE USER '"+textFieldBenutzername.getText()+"'@'"+comboBox.getSelectedItem().toString()+"' IDENTIFIED BY '"+textFieldPasswort.getText()+"';");
+					dbm.getStatement().executeUpdate("GRANT ALL PRIVILEGES ON crm . * TO '"+textFieldBenutzername.getText()+"'@'"+comboBox.getSelectedItem().toString()+"'");
+					JOptionPane.showMessageDialog(null, "Benutzer erfolgreich erstellt", "Info", JOptionPane.INFORMATION_MESSAGE);
+					getData(dbm);
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(null, e1, "Fehler", JOptionPane.ERROR_MESSAGE);
+				}
+				dbm.closeConnection();
+			}
+		});
+		
+		
+	
+	}
+	
+	private void getData(DBManager dbm) {
 		try {
 			//Listet alle relevante Benutzer auf (Tabelle)
 			dbm.startConnect("");
+	        DefaultTableModel tbm = (DefaultTableModel) table.getModel();
+	        tbm.setRowCount(0);
 			ResultSet rs = dbm.getStatement().executeQuery("select User, Host from mysql.user where not User=\"root\" and not User=\"mysql.infoschema\" and not User=\"mysql.session\" and not User=\"mysql.sys\" and not User='"+dbm.getUser()+"';");
 			while(rs.next()){
-				new ButtonColumn(table, deleteAction, 2);
+				//new ButtonColumn(table, deleteAction, 2);
 		        String data[] = {rs.getString(1),rs.getString(2),"Löschen"};
-		        DefaultTableModel tbm = (DefaultTableModel) table.getModel();
 		        tbm.addRow(data);
 		    }
 			dbm.closeConnection();

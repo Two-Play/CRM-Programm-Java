@@ -32,7 +32,7 @@ public class TerminBearbeiten extends JDialog {
 		setTitle("Termin bearbeiten");
 		setBounds(100, 100, 216, 357);
 		setModal(true);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/resources/icon.png")));
 		
 		JLabel lblNewLabel = new JLabel("Datum");
 		

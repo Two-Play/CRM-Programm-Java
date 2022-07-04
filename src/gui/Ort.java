@@ -31,7 +31,7 @@ public class Ort extends JDialog {
 		setTitle("Ort Anlegen");
 		setBounds(100, 100, 359, 133);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/img/icon.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AnmeldungGui.class.getResource("/resources/icon.png")));
 		setModal(true);
 		
 		JLabel lblPlz = new JLabel("PLZ");
