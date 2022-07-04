@@ -94,11 +94,12 @@ public class AuftraegeBearbeiten extends JDialog {
 					dbm.getStatement().executeUpdate("UPDATE crm.auftraege SET name = '"+
 					textFieldAuftragsname.getText()+"', start = '"+startDatum+"', ende = '"+endDatum+"', notiz = '"+textAreaNotiz.getText()+"', status = '"+
 					comboBox.getSelectedItem().toString()+"', kundenNr = "+kundenNrIndex+" where auftraegeNr = '"+auftragsNr+"';");
-					JOptionPane.showMessageDialog(null, "Termin erfolgreich erstellt!");
+					JOptionPane.showMessageDialog(null, "Auftrag erfolgreich geändert!");
 				} catch (SQLException e1) {
 					JOptionPane.showMessageDialog(null, e1, "Fehler", JOptionPane.ERROR_MESSAGE);
 					e1.printStackTrace();
 				}
+				dbm.closeConnection();
 			}
 		});
 		
@@ -108,7 +109,7 @@ public class AuftraegeBearbeiten extends JDialog {
 		textFieldAuftragsnummer.setEditable(false);
 		textFieldAuftragsnummer.setColumns(10);
 		
-		JButton btnLoeschen = new JButton("Termin Löschen");
+		JButton btnLoeschen = new JButton("Auftrag Löschen");
 		btnLoeschen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int dialogButton = JOptionPane.YES_NO_OPTION;

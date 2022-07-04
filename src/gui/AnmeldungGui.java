@@ -135,7 +135,9 @@ public class AnmeldungGui extends JFrame {
 		txtHost.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				loginAktion();
+				if (e.getKeyCode()==KeyEvent.VK_ENTER){
+				      loginAktion();
+				    }
 			}
 		});
 		txtHost.setText("localhost");
@@ -206,7 +208,7 @@ public class AnmeldungGui extends JFrame {
 						try {
 							//DB Erstellung mit sql script
 							ScriptRunner runner = new ScriptRunner(dbm.getConnection(), false, true);
-							runner.runScript(new BufferedReader(new FileReader("src/init.sql")));
+							runner.runScript(new BufferedReader(new FileReader("init.sql")));
 							System.out.println("DB eingefügt");
 							//Schließt fenster und öffnet MainView falls DB nichht besteht
 							dispose();

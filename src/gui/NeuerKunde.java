@@ -251,7 +251,7 @@ public class NeuerKunde extends JDialog {
 							"', '"+textFieldStrasse.getText()+"', '"+textAreaBemerkung.getText()+"','"+textAreaInteresse.getText()+"','"+gebTag+"','"+comboBox.getSelectedItem()+"', '"+rs.getString(1)+"');");
 					rs.close();
 					dbm.closeConnection();
-
+					JOptionPane.showMessageDialog(null, "Kunde erfolgreich erstellt!");
 				} catch (SQLException e1) {
 					JOptionPane.showMessageDialog(null, e1, "Fehler", JOptionPane.ERROR_MESSAGE);
 					e1.printStackTrace();

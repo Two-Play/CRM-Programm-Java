@@ -333,14 +333,20 @@ public class Kunden extends JDialog {
 			new Object[][] {
 			},
 			new String[] {
-				"Uhrzeit", "Datum", "Bemerkung"
+				"TerminNr", "Uhrzeit", "Datum", "Bemerkung"
 			}
 		) {
 			Class[] columnTypes = new Class[] {
-				String.class, String.class, String.class
+				String.class, String.class, String.class, String.class
 			};
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
+			}
+			boolean[] columnEditables = new boolean[] {
+				false, false, false, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
 			}
 		});
 		scrollPane_3.setViewportView(tableTermin);
@@ -425,11 +431,14 @@ public class Kunden extends JDialog {
 		
 		dbm.startConnect("crm");
 		try {
-			ResultSet rs = dbm.getStatement().executeQuery("SELECT auftraege.name, status, auftraegeNr  FROM crm.auftraege where auftraege.kundenNr = '"+textFieldKundenNr.getText()+"';");
-			while(rs.next()){
-		        String data[] = {rs.getString(3), rs.getString(1), rs.getString(2)};
-		        DefaultTableModel tbm = (DefaultTableModel) tableAuftrag.getModel();
-		        tbm.addRow(data);
+			
+			
+			
+			ResultSet rsA = dbm.getStatement().executeQuery("SELECT auftraege.name, status, auftraegeNr  FROM crm.auftraege where auftraege.kundenNr = '"+textFieldKundenNr.getText()+"';");
+			while(rsA.next()){
+		        String data[] = {rsA.getString(3), rsA.getString(1), rsA.getString(2)};
+		        DefaultTableModel tbmA = (DefaultTableModel) tableAuftrag.getModel();
+		        tbmA.addRow(data);
 		    }
 
 		} catch (SQLException e) {
@@ -450,12 +459,34 @@ public class Kunden extends JDialog {
 	         }
 	      });
 		
+		tableTermin.addMouseListener((MouseListener) new MouseAdapter() {
+	         public void mouseClicked(MouseEvent me) {
+	            if (me.getClickCount() == 2) {     // to detect doble click events
+	               JTable target = (JTable)me.getSource();
+	               int row = target.getSelectedRow(); // select a row
+	               String tableRow = (String) tableTermin.getValueAt(row, 0); // get the value of a row and column.
+	               System.out.println(tableRow);
+	               new TerminBearbeiten(dbm, tableRow).setVisible(true);
+	               
+	            }
+	         }
+	      });
+
+		
 		addWindowFocusListener(new WindowFocusListener() {
 			public void windowGainedFocus(WindowEvent e) {
 				DefaultTableModel tbm = (DefaultTableModel) tableAuftrag.getModel();    
 				tbm.setRowCount(0);
 				dbm.startConnect("crm");
+				DefaultTableModel tbmT = (DefaultTableModel) tableTermin.getModel();    
+				tbmT.setRowCount(0);
+				
 				try {
+					ResultSet rsT = dbm.getStatement().executeQuery("SELECT * FROM crm.termine where termine.kundenNr = "+kundenNr+";");
+					while(rsT.next()){
+				        String data[] = {rsT.getString(1), rsT.getString(3), rsT.getString(2),rsT.getString(4)};
+				        tbmT.addRow(data);
+				    }
 					ResultSet rs = dbm.getStatement().executeQuery("SELECT auftraege.name, status, auftraegeNr  FROM crm.auftraege where auftraege.kundenNr = '"+textFieldKundenNr.getText()+"';");
 					while(rs.next()){
 				        String data[] = {rs.getString(3), rs.getString(1), rs.getString(2)};
